@@ -13,7 +13,7 @@
       file:
         path: /etc/systemd/system/lighthouse.service
         state: absent
-  when: inventory_hostname in groups['nebula_lighthouse']
+  when: inventory_hostname in nebula_lighthouses_inventory
 
 - name: Remove Nebula nodes
   block:
@@ -29,7 +29,7 @@
       file:
         path: /etc/systemd/system/nebula.service
         state: absent
-  when: inventory_hostname not in groups['nebula_lighthouse']
+  when: inventory_hostname not in nebula_lighthouses_inventory
 
 - name: Remove Nebula installation directory
   file:

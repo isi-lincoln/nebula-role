@@ -2,12 +2,12 @@
   systemd:
     name: nebula
     state: restarted
-  when: inventory_hostname not in groups['nebula_lighthouse']
+  when: inventory_hostname not in nebula_lighthouses_inventory
   listen: "restart nebula"
 
 - name: Restart Lighthouse
   systemd:
     name: lighthouse
     state: restarted
-  when: inventory_hostname in groups['nebula_lighthouse']
+  when: inventory_hostname in nebula_lighthouses_inventory
   listen: "restart nebula"

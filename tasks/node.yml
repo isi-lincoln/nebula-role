@@ -3,13 +3,13 @@
     chdir: /opt/nebula
     cmd: ./nebula-cert sign -name "{{ inventory_hostname }}" -ip "{{ nebula_internal_ip_addr }}/{{ nebula_network_cidr }}" -duration "{{ nebula_client_cert_duration }}"
     creates: "/opt/nebula/{{ inventory_hostname }}.crt"
-  delegate_to: "{{ groups.nebula_lighthouse[0] }}"
+  delegate_to: "{{ nebula_lighthouses_inventory[0] }}"
 
 - name: Ensure lighthouse has hosts file entry for node
   lineinfile:
     path: /etc/hosts
     line: "{{ nebula_internal_ip_addr }} {{ inventory_hostname }}.neb"
-  delegate_to: "{{ groups.nebula_lighthouse[0] }}"
+  delegate_to: "{{ nebula_lighthouses_inventory[0] }}"
   when: nebula_lighthouse_build_hosts_file
 
 - name: Ensure node has hosts file entry for lighthouse
@@ -22,7 +22,7 @@
   slurp:
     src: "/opt/nebula/{{ item }}"
   register: lighthouse_files
-  delegate_to: "{{ groups.nebula_lighthouse[0] }}"
+  delegate_to: "{{ nebula_lighthouses_inventory[0] }}"
   with_items: 
     - "{{ inventory_hostname }}.crt"
     - "{{ inventory_hostname }}.key"
