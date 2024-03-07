@@ -97,7 +97,7 @@ tun:
   # sensible defaults. don't monkey with these unless
   # you're CERTAIN you know what you're doing.
   #
-  dev: neb0
+  dev: {{ nebula_interface_name }}
   drop_local_broadcast: false
   drop_multicast: false
   tx_queue: 500
