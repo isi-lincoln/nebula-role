@@ -1,0 +1,7 @@
+[Match]
+Name={{ nebula_interface_name }}
+
+[Network]
+Address={{ overlay[inventory_hostname].ip }}/{{ overlay[inventory_hostname].netmask }}
+DNS={{ nebula_lighthouse_internal_ip_addr }}
+Domains={{ nebula_fqdn }}

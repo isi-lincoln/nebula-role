@@ -91,3 +91,16 @@
     minute: "{{ nebula_check_cron_minute | default('*/5') }}"
     job: "/opt/nebula/nebula-check.sh"
   when: nebula_install_check_cron|bool
+
+- name: Add systemd-networkd template for using overlay dns
+  template:
+    src: nebula_dns.network.j2
+    dest: /etc/systemd/network/{{ nebula_interface_name }}.network
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart systemd-networkd to get our dns resolution
+  service:
+    name: systemd-networkd
+    state: restarted
