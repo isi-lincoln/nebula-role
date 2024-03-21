@@ -1,15 +1,22 @@
 ---
-- name: Ensure CA cert/key exists
-  command:
-    chdir: /opt/nebula
-    cmd: ./nebula-cert ca -name "{{ nebula_network_name }}" -duration "{{ nebula_ca_cert_duration }}"
-    creates: /opt/nebula/ca.crt
 
-- name: Ensure lighthouse cert/key exists
-  command:
-    chdir: /opt/nebula
-    cmd: ./nebula-cert sign -name "{{ nebula_lighthouse_hostname }}" -ip "{{ nebula_lighthouse_internal_ip_addr }}/{{ nebula_network_cidr }}" -duration "{{ nebula_client_cert_duration }}"
-    creates: "/opt/nebula/{{ nebula_lighthouse_hostname }}.crt"
+# TODO: this assumes nebula_lighthouse_hostname is the same as the ansible inventory name
+- name: Set FQDN for each host
+  set_fact:
+    local_fqdn: "{{ nebula_lighthouse_hostname }}.{{ nebula_fqdn }}"
+
+- name: Get lighthouse keys from localhost
+  copy:
+    src: "{{ local_fqdn }}.{{ item }}"
+    dest: /opt/nebula/{{ local_fqdn }}.{{ item }}
+  loop:
+    - crt
+    - key
+
+- name: Get ca cert from localhost
+  copy:
+    src: "ca.crt"
+    dest: /opt/nebula/ca.crt
 
 - name: Ensure lighthouse is configured
   template:
@@ -28,10 +35,11 @@
     group: root
     mode: '0644'
 
+# We want to restart to pick up the dns config settings
 - name: Ensure lighthouse service is enabled and running
   systemd: 
     name: lighthouse
     daemon_reload: yes
     enabled: yes
     masked: no
-    state: started
+    state: restarted

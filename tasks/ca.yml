@@ -1,0 +1,78 @@
+---
+- name: Install expect to handle user inputs
+  apt:
+    pkg: expect
+    state: latest
+  become: yes
+
+- name: copy ca expect template if ca is encrypted
+  template:
+    src: create_ca.sh.j2 
+    dest: /opt/nebula/create_ca.sh
+    owner: root
+    group: root
+    mode: '0700'
+  when: nebula_ca_encrypt|bool is true
+
+- name: copy signing expect template if ca is encrypted
+  template:
+    src: sign_with_ca.sh.j2 
+    dest: /opt/nebula/signing.sh
+    owner: root
+    group: root
+    mode: '0700'
+  when: nebula_ca_encrypt|bool is true
+
+- name: Create unencrypted CA
+  command: 
+    chdir: /opt/nebula
+    cmd: /opt/nebula/nebula-cert ca -name {{ nebula_network_name }} -duration {{ nebula_ca_cert_duration }}
+  when: nebula_ca_encrypt|bool is false
+
+- name: Create encrypted CA
+  command:
+    chdir: /opt/nebula
+    cmd: /opt/nebula/create_ca.sh
+  when: nebula_ca_encrypt|bool is true
+
+# Create Keys
+- name: Create keys for each node (encrypted)
+  command:
+    cmd: /opt/nebula/signing.sh
+    chdir: /opt/nebula
+  environment:
+    NODE_NAME: "{{ item.key }}.{{ nebula_fqdn }}"
+    NODE_IP: "{{ overlay[item.key].ip }}"
+    NODE_NETWORK: "{{ overlay[item.key].netmask }}"
+  loop: "{{ overlay | dict2items }}"
+  when: nebula_ca_encrypt|bool is true
+
+- name: Create keys for each node (unencrypted)
+  command:
+    chdir: /opt/nebula
+    cmd: ./nebula-cert sign -name "{{ item.key }}.{{ nebula_fqdn }}" -ip "{{ overlay[item.key].ip }}/{{ overlay[item.key].netmask }}" -duration "{{ nebula_client_cert_duration }}" -out-crt "/opt/nebula/{{ item.key }}.{{ nebula_fqdn }}.crt"
+  loop: "{{ overlay | dict2items }}"
+  when: nebula_ca_encrypt|bool is false
+
+# Distribute Keys to Hosts
+- name: Get certs on localhost
+  fetch:
+    src: /opt/nebula/{{ item.key }}.{{ nebula_fqdn }}.crt
+    dest: ./{{ item.key }}.{{ nebula_fqdn }}.crt
+    flat: true
+  loop: "{{ overlay | dict2items }}"
+
+- name: Get keys on localhost
+  fetch:
+    src: /opt/nebula/{{ item.key }}.{{ nebula_fqdn }}.key
+    dest: ./{{ item.key }}.{{ nebula_fqdn }}.key
+    flat: true
+  loop: "{{ overlay | dict2items }}"
+
+
+
+- name: Get ca cert
+  fetch:
+    src: /opt/nebula/ca.crt
+    dest: ./ca.crt
+    flat: true

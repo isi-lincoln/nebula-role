@@ -1,7 +1,10 @@
 nebula_version: 1.8.0
 nebula_network_name: "Avoid"
+nebula_fqdn: "{{ nebula_network_name }}.org"
 nebula_network_cidr: 24
 nebula_ca_cert_duration: "87600h0m0s" #10 years
+nebula_ca_password: "test"
+nebula_ca_encrypt: false
 nebula_client_cert_duration: "43800h0m0s" #5 years
 nebula_clean_install: false
 nebula_lighthouse_build_hosts_file: true

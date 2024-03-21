@@ -2,8 +2,8 @@ pki:
   # every node needs a copy of ca.crt, <client-name>.key,
   # and <client-name>.crt
   ca: /opt/nebula/ca.crt
-  cert: /opt/nebula/{{ nebula_lighthouse_hostname }}.crt
-  key: /opt/nebula/{{ nebula_lighthouse_hostname }}.key
+  cert: /opt/nebula/{{ nebula_lighthouse_hostname }}.{{ nebula_fqdn }}.crt
+  key: /opt/nebula/{{ nebula_lighthouse_hostname }}.{{ nebula_fqdn }}.key
 
 static_host_map:
  # how to find one or more lighthouse nodes
@@ -15,6 +15,10 @@ static_host_map:
  "{{ nebula_lighthouse_internal_ip_addr }}": ["{{ nebula_lighthouse_public_hostname }}:{{ nebula_lighthouse_public_port }}"]
 
 lighthouse:
+  serve_dns: true
+  dns:
+    host: {{ nebula_lighthouse_internal_ip_addr }}
+    port: 53
   interval: 60
 
   # if you're a lighthouse, say you're a lighthouse

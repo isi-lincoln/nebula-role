@@ -3,8 +3,8 @@ pki:
   # and its own certificate and key, ONLY.
   #
   ca: /opt/nebula/ca.crt
-  cert: /opt/nebula/{{ inventory_hostname }}.crt
-  key: /opt/nebula/{{ inventory_hostname }}.key
+  cert: /opt/nebula/{{ inventory_hostname }}.{{ nebula_fqdn }}.crt
+  key: /opt/nebula/{{ inventory_hostname }}.{{ nebula_fqdn }}.key
 
 static_host_map:
  # how to find one or more lighthouse nodes
