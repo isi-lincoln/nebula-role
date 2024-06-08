@@ -15,11 +15,11 @@ static_host_map:
  "{{ nebula_lighthouse_internal_ip_addr }}": ["{{ nebula_lighthouse_public_hostname }}:{{ nebula_lighthouse_public_port }}"]
 
 lighthouse:
-  serve_dns: true
-  dns:
-    host: {{ nebula_lighthouse_internal_ip_addr }}
-    port: 53
-  interval: 60
+  # serve_dns: true
+  # dns:
+  #  host: {{ nebula_lighthouse_internal_ip_addr }}
+  #  port: 53
+  # interval: 60
 
   # if you're a lighthouse, say you're a lighthouse
   #

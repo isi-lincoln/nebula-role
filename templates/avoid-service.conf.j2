@@ -1,0 +1,8 @@
+avoid:
+  endpoints:
+{% for ep in avoid_endpoints %}
+{% set lep = ep.split(':') %}
+    - address: {{ lep[0] }}
+      port: {{ lep[1] }}
+{% endfor %}
+  identity: {{ inventory_hostname }}

@@ -5,8 +5,11 @@
       include_tasks: uninstall.yml
       when: nebula_clean_install|bool
     
-    - name: Install Nebula on all hosts 
-      include_tasks: nebula.yml
+#    - name: Install Nebula on all hosts 
+#      include_tasks: nebula.yml
+#
+    - name: Install Nebula from source on all hosts 
+      include_tasks: install_nebula_go.yml
 
     - name: Install certificate authority
       include_tasks: ca.yml

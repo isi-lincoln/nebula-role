@@ -13,6 +13,9 @@ nebula_node_use_lighthouse_as_relay: true
 nebula_install_check_cron: true
 nebula_interface_name: neb0
 
+avoid_endpoints: []
+install_user: rvn # TODO: if not found, use ansible user
+
 nebula_lighthouse_inventory: lighthouse
 nebula_lighthouse_hostname: lighthouse
 nebula_lighthouse_internal_ip_addr: 192.168.77.1
