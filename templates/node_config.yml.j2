@@ -155,3 +155,6 @@ firewall:
       proto: {{ rule.proto }}
       host: {{ rule.host }}
 {% endfor %}
+
+avoid:
+  config: /etc/avoid/avoid.conf
