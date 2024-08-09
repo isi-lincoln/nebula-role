@@ -71,6 +71,12 @@ remote_allow_list:
 #local_allow_list:
 # Example to block tun0 and all docker interfaces.
 local_allow_list:
+{% if "interfaces" in config[inventory_hostname] %}
+  interfaces:
+{% for iface in config[inventory_hostname].interfaces %}
+    {{ iface.name }}: true
+{% endfor %}
+{% endif %}
 
 #interfaces:
 #tun0: false
