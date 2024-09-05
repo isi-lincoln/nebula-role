@@ -69,8 +69,6 @@
     flat: true
   loop: "{{ overlay | dict2items }}"
 
-
-
 - name: Get ca cert
   fetch:
     src: /opt/nebula/ca.crt

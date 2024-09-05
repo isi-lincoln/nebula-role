@@ -4,7 +4,7 @@
 
 - name: Get lighthouse keys from localhost
   copy:
-    src: "{{ local_fqdn }}.{{ item }}"
+    src: "{{key_location}}/{{ local_fqdn }}.{{ item }}"
     dest: /opt/nebula/{{ local_fqdn }}.{{ item }}
   loop:
     - crt
@@ -12,7 +12,7 @@
 
 - name: Get ca cert from localhost
   copy:
-    src: "ca.crt"
+    src: "{{key_location}}/ca.crt"
     dest: /opt/nebula/ca.crt
 
 
