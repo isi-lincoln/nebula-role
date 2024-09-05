@@ -8,19 +8,12 @@
     - name: Install Nebula on all hosts 
       include_tasks: nebula.yml
 
-# TODO: Lincoln to deploy my own code
-#    - name: Install Nebula from source on all hosts 
-#      include_tasks: install_nebula_go.yml
-
-    - name: Install certificate authority
-      include_tasks: ca.yml
-      when: inventory_hostname in nebula_certificate_authority
-    
     - name: Deploy Lighthouse
       include_tasks: lighthouse.yml
       when: inventory_hostname in nebula_lighthouses_inventory
     
     - name: Deploy Nebula Node
       include_tasks: node.yml
-      when: inventory_hostname not in nebula_lighthouses_inventory and inventory_hostname != nebula_certificate_authority
+      when: inventory_hostname not in nebula_lighthouses_inventory
+
   when: inventory_hostname in nebula_lighthouses_inventory or nebula_internal_ip_addr is defined
