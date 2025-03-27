@@ -13,7 +13,7 @@
       file:
         path: /etc/systemd/system/lighthouse.service
         state: absent
-  when: inventory_hostname in nebula_lighthouses_inventory
+  when: inventory_hostname in (nebula_lighthouses | map(attribute='inventory') | list) 
 
 - name: Remove Nebula nodes
   block:
@@ -29,11 +29,11 @@
       file:
         path: /etc/systemd/system/nebula.service
         state: absent
-  when: inventory_hostname not in nebula_lighthouses_inventory
+  when: inventory_hostname not in (nebula_lighthouses | map(attribute='inventory') | list) 
 
 - name: Remove Nebula installation directory
   file:
-    path: /opt/nebula
+    path: "{{ nebula_install_destination}}"
     state: absent
 
 - name: Remove Nebula check from cron

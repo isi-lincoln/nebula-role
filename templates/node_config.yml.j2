@@ -2,9 +2,9 @@ pki:
   # every node needs a copy of the CA certificate,
   # and its own certificate and key, ONLY.
   #
-  ca: /opt/nebula/ca.crt
-  cert: /opt/nebula/{{ inventory_hostname }}.{{ nebula_fqdn }}.crt
-  key: /opt/nebula/{{ inventory_hostname }}.{{ nebula_fqdn }}.key
+  ca: {{ nebula_install_destination}}/ca.crt
+  cert: {{ nebula_install_destination}}/{{ inventory_hostname }}.{{ nebula_fqdn }}.crt
+  key: {{ nebula_install_destination}}/{{ inventory_hostname }}.{{ nebula_fqdn }}.key
 
 static_host_map:
  # how to find one or more lighthouse nodes
@@ -12,7 +12,9 @@ static_host_map:
  #
  # format "Nebula IP": ["public IP or hostname:port"]
  #
- "{{ nebula_lighthouse_internal_ip_addr }}": ["{{ nebula_lighthouse_public_hostname }}:{{ nebula_lighthouse_public_port }}"]
+{% for lh in nebula_lighthouses %}
+ "{{ lh.overlay_addr}}": ["{{ lh.public_addr_or_name }}:{{ lh.public_port }}"]
+{% endfor %}
 
 lighthouse:
   interval: 60
@@ -27,7 +29,9 @@ lighthouse:
     # lighthouse nodes here, one per line, in the following
     # format:
     #
-    - "{{ nebula_lighthouse_internal_ip_addr }}"
+{% for lh in nebula_lighthouses %}
+    - "{{ lh.overlay_addr}}"
+{% endfor %}
 
 listen:
   # 0.0.0.0 means "all interfaces," which is probably what you want
@@ -89,11 +93,28 @@ local_allow_list:
 #
 punchy: true
 
+# TODO: this should be passed into the role
+{% if inventory_hostname in nebula_end_users %}
 relay:
   am_relay: false
-  use_relays: {{ nebula_node_use_lighthouse_as_relay }}
+{% if nebula_relays is defined and nebula_relays|length > 0 %}
+  use_relays: true
   relays:
-    - {{ nebula_lighthouse_internal_ip_addr }}
+  {% for relay in nebula_relays | default([]) %}
+    - {{ overlay[relay].ip }}
+  {% endfor %}
+{% else %}
+  use_relays: false
+{% endif %}
+{% elif inventory_hostname in nebula_relays %}
+relay:
+  am_relay: true
+  use_relays: false
+{% else %}
+relay:
+  am_relay: false
+  use_relays: false
+{% endif %}
 
 # "punch_back" allows the other node to try punching out to you,
 # if you're having trouble punching out to it. Useful for stubborn

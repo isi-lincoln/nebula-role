@@ -1,9 +1,9 @@
 pki:
   # every node needs a copy of ca.crt, <client-name>.key,
   # and <client-name>.crt
-  ca: /opt/nebula/ca.crt
-  cert: /opt/nebula/{{ nebula_lighthouse_hostname }}.{{ nebula_fqdn }}.crt
-  key: /opt/nebula/{{ nebula_lighthouse_hostname }}.{{ nebula_fqdn }}.key
+  ca: {{ nebula_install_destination}}/ca.crt
+  cert: {{ nebula_install_destination}}/{{ inventory_hostname }}.{{ nebula_fqdn }}.crt
+  key: {{ nebula_install_destination}}/{{ inventory_hostname }}.{{ nebula_fqdn }}.key
 
 static_host_map:
  # how to find one or more lighthouse nodes
@@ -12,12 +12,16 @@ static_host_map:
  #
  # format "<internal-nebula-ip-addr>": ["<pub-ip-addr>:[port] or <hostname>:[port]"]
  #
- "{{ nebula_lighthouse_internal_ip_addr }}": ["{{ nebula_lighthouse_public_hostname }}:{{ nebula_lighthouse_public_port }}"]
+{% for lh in nebula_lighthouses %}
+#{% if lh.inventory == inventory_hostname %}
+ "{{ lh.overlay_addr }}": ["{{ lh.public_addr_or_name }}:{{ lh.public_port }}"]
+#{% endif %}
+{% endfor %}
 
 lighthouse:
   # serve_dns: true
   # dns:
-  #  host: {{ nebula_lighthouse_internal_ip_addr }}
+  #  host: {{ overlay[inventory_hostname].ip }}
   #  port: 53
   # interval: 60
 
@@ -32,15 +36,23 @@ lighthouse:
     # format:
     #
     # - "192.168.77.1"
-  {% if nebula_lighthouse_extra_config|length > 0 %}
-  {{- nebula_lighthouse_extra_config | to_nice_yaml | indent(2) }}
+{% for lh in nebula_lighthouses %}
+{% if lh.inventory == inventory_hostname %}
+  {% if lh.extra_config is defined and lh.extra_config|length > 0 %}
+  {{- lh.extra_config | to_nice_yaml | indent(2) }}
   {% endif %}
+{% endif %}
+{% endfor %}
 
 listen:
   # 0.0.0.0 means "all interfaces," which is probably what you want
   #
   host: 0.0.0.0
-  port: {{ nebula_lighthouse_public_port }}
+{% for lh in nebula_lighthouses %}
+{% if lh.inventory == inventory_hostname %}
+  port: {{ lh.public_port }}
+{% endif %}
+{% endfor %}
 
 # "punchy" basically means "send frequent keepalive packets"
 # so that your router won't expire and close your NAT tunnels.
@@ -54,7 +66,11 @@ punchy: true
 punch_back: true
 
 relay:
-  am_relay: {{ nebula_lighthouse_is_relay }}
+{% for lh in nebula_lighthouses %}
+{% if lh.inventory == inventory_hostname %}
+  am_relay: {{ lh.is_relay | default(false) }}
+{% endif %}
+{% endfor %}
   use_relays: false
 
 tun:

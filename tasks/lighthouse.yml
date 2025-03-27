@@ -1,14 +1,14 @@
 ---
 
-# TODO: this assumes nebula_lighthouse_hostname is the same as the ansible inventory name
+# TODO: this assumes a lot about the inventory_hostname and the certificate details
 - name: Set FQDN for each host
   set_fact:
-    local_fqdn: "{{ nebula_lighthouse_hostname }}.{{ nebula_fqdn }}"
+    local_fqdn: "{{ inventory_hostname }}.{{ nebula_fqdn }}"
 
 - name: Get lighthouse keys from localhost
   copy:
     src: "{{ local_fqdn }}.{{ item }}"
-    dest: /opt/nebula/{{ local_fqdn }}.{{ item }}
+    dest: "{{ nebula_install_destination}}/{{ local_fqdn }}.{{ item }}"
   loop:
     - crt
     - key
@@ -16,12 +16,12 @@
 - name: Get ca cert from localhost
   copy:
     src: "ca.crt"
-    dest: /opt/nebula/ca.crt
+    dest: "{{ nebula_install_destination}}/ca.crt"
 
 - name: Ensure lighthouse is configured
   template:
     src: lighthouse_config.yml.j2 
-    dest: /opt/nebula/config.yml
+    dest: "{{ nebula_install_destination}}/config.yml"
     owner: root
     group: root
     mode: '0400'

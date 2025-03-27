@@ -1,6 +1,6 @@
 #!/usr/bin/expect
 
-spawn /opt/nebula/nebula-cert ca -name {{ nebula_network_name }} -duration {{ nebula_ca_cert_duration }} -encrypt
+spawn {{ nebula_install_destination}}/nebula-cert ca -name {{ nebula_network_name }} -duration {{ nebula_ca_cert_duration }} -encrypt
 expect "Enter passphrase: \n"
 send -- "{{ nebula_ca_password }}\r"
 expect eof

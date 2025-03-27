@@ -5,7 +5,7 @@
 - name: Get lighthouse keys from localhost
   copy:
     src: "{{ local_fqdn }}.{{ item }}"
-    dest: /opt/nebula/{{ local_fqdn }}.{{ item }}
+    dest: "{{ nebula_install_destination}}/{{ local_fqdn }}.{{ item }}"
   loop:
     - crt
     - key
@@ -13,48 +13,19 @@
 - name: Get ca cert from localhost
   copy:
     src: "ca.crt"
-    dest: /opt/nebula/ca.crt
-
-
-
-#- name: Ensure lighthouse has hosts file entry for node
-#  lineinfile:
-#    path: /etc/hosts
-#    line: "{{ nebula_internal_ip_addr }} {{ local_fqdn }}"
-#  delegate_to: "{{ nebula_lighthouses_inventory[0] }}"
-#  when: nebula_lighthouse_build_hosts_file
+    dest: "{{ nebula_install_destination}}/ca.crt"
 
 - name: Ensure node has hosts file entry for lighthouse
   lineinfile:
     path: /etc/hosts
-    line: "{{ nebula_lighthouse_internal_ip_addr }} {{ nebula_lighthouse_hostname }}.{{ nebula_fqdn }}"
+    line: "{{ item.overlay_addr }} {{ item.inventory }}.{{ nebula_fqdn }}"
+  loop: "{{ nebula_lighthouses }}"
   when: nebula_node_lighthouse_in_hosts_file
-
-#- name: Read cert/key from lighthouse
-#  slurp:
-#    src: "/opt/nebula/{{ local_fqdn }}"
-#  register: lighthouse_files
-#  delegate_to: "{{ nebula_lighthouses_inventory[0] }}"
-#  with_items: 
-#    - "{{ local_fqdn }}.crt"
-#    - "{{ local_fqdn }}.key"
-#    - ca.crt
-#
-#- name: Ensure Cert, Key, CA files exist
-#  copy:
-#    dest: "/opt/nebula/{{ item['item'] }}"
-#    content: "{{ item['content'] | b64decode }}"
-#    owner: root
-#    group: root
-#    mode: 0600
-#  loop: "{{ lighthouse_files.results }}"
-#  loop_control:
-#    label: "{{ item['item'] }}"
 
 - name: Ensure Nebula is configured
   template:
     src: node_config.yml.j2 
-    dest: /opt/nebula/config.yml
+    dest: "{{ nebula_install_destination}}/config.yml"
     owner: root
     group: root
     mode: '0400'
@@ -79,7 +50,7 @@
 - name: Ensure nebula-check is present
   template:
     src: nebula-check.sh.j2
-    dest: /opt/nebula/nebula-check.sh
+    dest: "{{ nebula_install_destination}}/nebula-check.sh"
     owner: root
     group: root
     mode: '0755'
@@ -89,7 +60,7 @@
   cron:
     name: "nebula-check"
     minute: "{{ nebula_check_cron_minute | default('*/5') }}"
-    job: "/opt/nebula/nebula-check.sh"
+    job: "{{ nebula_install_destination}}/nebula-check.sh"
   when: nebula_install_check_cron|bool
 
 - name: Add systemd-networkd template for using overlay dns

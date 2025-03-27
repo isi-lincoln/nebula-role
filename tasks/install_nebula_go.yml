@@ -7,14 +7,14 @@
      - protobuf-compiler
 
 
-- name: Ensure /opt/nebula directory is gone
+- name: Ensure {{ nebula_install_destination}} directory is gone
   file:
-    path: /opt/nebula
+    path: "{{ nebula_install_destination}}"
     state: absent
 
-- name: Ensure /opt/nebula directory exists
+- name: Ensure {{ nebula_install_destination}} directory exists
   file:
-    path: /opt/nebula
+    path: "{{ nebula_install_destination}}"
     state: directory
     mode: '0700'
     owner: root
@@ -41,11 +41,11 @@
 
 - name: Check for existing Nebula install
   stat:
-    path: '/opt/nebula/nebula'
+    path: '{{ nebula_install_destination}}/nebula'
   register: installed_nebula_stats
 
 - name: Get Nebula version (if installed)
-  command: "/opt/nebula/nebula -version"
+  command: "{{ nebula_install_destination}}/nebula -version"
   register: installed_nebula_version_out
   changed_when: False
   failed_when: False
@@ -134,7 +134,7 @@
   copy:
     remote_src: true
     src: ./nebula/{{ item }}
-    dest: /opt/nebula/{{ item }}
+    dest: "{{ nebula_install_destination}}/{{ item }}"
     force: yes
   with_items:
     - nebula
@@ -142,7 +142,7 @@
 
 - name: Ensure Nebula binaries permissions are correct
   file:
-    path: "/opt/nebula/{{ item }}"
+    path: "{{ nebula_install_destination}}/{{ item }}"
     owner: root
     group: root
     mode: '0700'

@@ -3,5 +3,6 @@ Name={{ nebula_interface_name }}
 
 [Network]
 Address={{ overlay[inventory_hostname].ip }}/{{ overlay[inventory_hostname].netmask }}
-DNS={{ nebula_lighthouse_internal_ip_addr }}
+DNS={% for lh in nebula_lighthouses %}{{ lh.overlay_addr }}{% if not loop.last %} {% endif %}{% endfor %}
+
 Domains={{ nebula_fqdn }}

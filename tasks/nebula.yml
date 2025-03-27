@@ -1,6 +1,6 @@
-- name: Ensure /opt/nebula directory exists
+- name: Ensure {{ nebula_install_destination}} directory exists
   file:
-    path: /opt/nebula
+    path: "{{ nebula_install_destination}}"
     state: directory
     mode: '0700'
     owner: root
@@ -8,11 +8,11 @@
 
 - name: Check for existing Nebula install
   stat:
-    path: '/opt/nebula/nebula'
+    path: '{{ nebula_install_destination}}/nebula'
   register: installed_nebula_stats
 
 - name: Get Nebula version (if installed)
-  command: "/opt/nebula/nebula -version"
+  command: "{{ nebula_install_destination}}/nebula -version"
   register: installed_nebula_version_out
   changed_when: False
   failed_when: False
@@ -26,14 +26,14 @@
 - name: Download & Extract Nebula
   unarchive:
     src: "https://github.com/slackhq/nebula/releases/download/v{{ nebula_version }}/nebula-linux-{{ nebula_architectures[ansible_architecture] }}.tar.gz"
-    dest: "/opt/nebula"
+    dest: "{{ nebula_install_destination}}"
     remote_src: yes
   when: (installed_nebula_version|default(nebula_version) != nebula_version) or (not installed_nebula_stats.stat.exists)
   notify: restart nebula
 
 - name: Ensure Nebula binaries permissions are correct
   file:
-    path: "/opt/nebula/{{ item }}"
+    path: "{{ nebula_install_destination}}/{{ item }}"
     owner: root
     group: root
     mode: '0700'

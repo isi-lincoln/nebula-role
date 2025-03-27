@@ -9,7 +9,7 @@ Type=notify
 NotifyAccess=main
 SyslogIdentifier=nebula
 ExecReload=/bin/kill -HUP $MAINPID
-ExecStart=/opt/nebula/nebula -config /opt/nebula/config.yml
+ExecStart={{ nebula_install_destination}}/nebula -config {{ nebula_install_destination}}/config.yml
 Restart=always
 RestartSec=42s
 

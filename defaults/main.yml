@@ -9,20 +9,21 @@ nebula_client_cert_duration: "43800h0m0s" #5 years
 nebula_clean_install: false
 nebula_lighthouse_build_hosts_file: true
 nebula_node_lighthouse_in_hosts_file: true
-nebula_node_use_lighthouse_as_relay: true
 nebula_install_check_cron: true
 nebula_interface_name: neb0
+nebula_install_destination: /opt/nebula
 
 avoid_endpoints: []
 install_user: rvn # TODO: if not found, use ansible user
 
-nebula_lighthouse_inventory: lighthouse
-nebula_lighthouse_hostname: lighthouse
-nebula_lighthouse_internal_ip_addr: 192.168.77.1
-nebula_lighthouse_public_hostname: my-nebula-server.com
-nebula_lighthouse_public_port: 4242
-nebula_lighthouse_is_relay: true
-nebula_lighthouse_extra_config: {}
+nebula_lighthouses:
+  - inventory: lighthouse
+    hostname: lighthouse
+    overlay_addr: 192.168.77.1
+    public_addr_or_name: my-nebula-server.com
+    public_port: 4242
+    is_relay: true
+    extra_config: {}
 
 nebula_metrics_prometheus_enabled: false
 nebula_metrics_prometheus_listen: "127.0.0.1:4244"

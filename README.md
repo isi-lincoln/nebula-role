@@ -20,10 +20,14 @@ You can read more about Nebula [on the official repo](https://github.com/slackhq
     nebula_version: 1.8.0
     nebula_network_name: "Company Nebula Mgmt Net"
     nebula_network_cidr: 16
-
-    nebula_lighthouse_internal_ip_addr: 10.43.0.1
-    nebula_lighthouse_public_hostname: lighthouse.company.com
-    nebula_lighthouse_public_port: 4242
+    nebula_lighthouses:
+    - inventory: 'lh1'
+      hostname: 'lh1'
+      overlay_addr: 10.43.0.1
+      public_addr_or_name: lighthouse.company.com
+      public_port: 4242
+      is_relay: false
+      extra_config: {}
 
     nebula_firewall_drop_action: reject
 
@@ -39,7 +43,7 @@ You can read more about Nebula [on the official repo](https://github.com/slackhq
 
 # Example Inventory
 ```
-[nebula_lighthouse]
+[lighthouses]
 lighthouse01.company.com
 
 [servers]

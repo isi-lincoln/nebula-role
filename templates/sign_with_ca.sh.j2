@@ -1,6 +1,0 @@
-#!/usr/bin/expect
-
-spawn /opt/nebula/nebula-cert sign -name "$env(NODE_NAME)" -ip "$env(NODE_IP)/$env(NODE_NETWORK)" -duration "{{ nebula_client_cert_duration }}" -out-crt "/opt/nebula/$env(NODE_NAME).crt"
-expect "Enter passphrase: \n"
-send -- "{{ nebula_ca_password }}\r"
-expect eof
