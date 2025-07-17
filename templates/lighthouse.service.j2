@@ -5,8 +5,7 @@ After=basic.target network.target network-online.target
 Before=sshd.service
 
 [Service]
-Type=notify
-NotifyAccess=main
+Type=simple
 SyslogIdentifier=nebula
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart={{ nebula_install_destination }}/nebula -config {{ nebula_install_destination }}/config.yml
