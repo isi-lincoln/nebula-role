@@ -33,16 +33,8 @@ lighthouse:
     - "{{ lh.overlay_addr}}"
 {% endfor %}
 
-# local_allow_list allows you to filter which local IP addresses we advertise
-# to the lighthouses. This uses the same logic as `remote_allow_list`, but
-# additionally, you can specify an `interfaces` map of regular expressions
-# to match against interface names. The regexp must match the entire name.
-# All interface rules must be either true or false (and the default will be
-# the inverse). CIDR rules are matched after interface name rules.
-# Default is all local IP addresses.
-#local_allow_list:
 # Example to block tun0 and all docker interfaces.
-  local_allow_list:
+avoid_interfaces:
 {% set configured_interfaces = [] %}
 {% if "interfaces" in config[inventory_hostname] %}
 {% set configured_interfaces = config[inventory_hostname].interfaces | map(attribute='name') | list %}
@@ -62,7 +54,6 @@ lighthouse:
 {% endif %}
 {% endfor %}
 {% endif %}
-
 
 
 listen:
@@ -88,10 +79,12 @@ relay:
   am_relay: false
 {% if nebula_relays is defined and nebula_relays|length > 0 %}
   use_relays: true
+{% if inventory_hostname in nebula_add_relays %}
   relays:
   {% for relay in nebula_relays | default([]) %}
     - {{ overlay[relay].ip }}
   {% endfor %}
+{% endif %}
 {% else %}
   use_relays: false
 {% endif %}
